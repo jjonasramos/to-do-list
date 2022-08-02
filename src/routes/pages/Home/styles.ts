@@ -13,11 +13,15 @@ const styles = StyleSheet.create({
         marginBottom: 12
     },
     inputContainer: {
-        marginBottom: 24,
         flexDirection: 'row',
-        justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#ececec',
+        borderRadius: 8
+    },
+    searchContainer: {
+        marginBottom: 24,
+        flexDirection: 'row',
+        alignItems: 'center',
         borderRadius: 8,
     },
     inputIcon: {
@@ -25,6 +29,11 @@ const styles = StyleSheet.create({
     },
     input: {
         flex: 1,
+        fontSize: 16,
+        paddingVertical: 9
+    },
+    cancel: {
+        marginLeft: 10
     }
 });
 

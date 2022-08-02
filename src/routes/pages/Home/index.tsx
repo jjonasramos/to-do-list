@@ -1,4 +1,16 @@
-import { View, FlatList, Text, SafeAreaView, TextInput } from "react-native";
+import { useEffect, useState } from "react";
+import { 
+    View, 
+    FlatList, 
+    Text, 
+    SafeAreaView, 
+    TextInput, 
+    TouchableWithoutFeedback, 
+    Keyboard,
+    Button,
+    Animated,
+    Easing
+} from "react-native";
 import Icon from '@expo/vector-icons/Ionicons';
 import TaskItem from "../../../components/TaskItem";
 import styles from './styles';
@@ -29,13 +41,84 @@ const DATA = [
 
 const Home = () => {
 
+    const [isFocused, setIsFocused] = useState(false);
+    const [fadeAnimation, setFadeAnimation] = useState(new Animated.Value(0));
+    const [animation, setAnimation] = useState(new Animated.Value(0));
+    const [searchText, setSearchText] = useState('');
+
+    useEffect(() => {
+        if(isFocused) animateIn();
+        else animateOut();
+    }, [isFocused]);
+
+    const animateIn = () => {
+        Animated.timing(fadeAnimation, {
+            toValue: 1,
+            duration: 450,
+            useNativeDriver: true,
+        }).start();
+
+        Animated.timing(animation, {
+            toValue: 1,
+            duration: 250,
+            useNativeDriver: false,
+            easing: Easing.sin,
+        }).start();
+    }
+
+    const animateOut = () => {
+        Animated.timing(fadeAnimation, {
+            toValue: 0,
+            duration: 250,
+            useNativeDriver: true
+        }).start();
+        
+        Animated.timing(animation, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: false,
+            easing: Easing.sin
+        }).start();
+    }
+
+    const handleCancelSearch = () => {
+        setSearchText('');
+        setIsFocused(false);
+        Keyboard.dismiss();
+    }
+
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.container}>
                 <Text style={styles.title}>Your Tasks</Text>
-                <View style={styles.inputContainer}>
-                    <Icon style={styles.inputIcon} name="search-outline" size={16} color="#777" />
-                    <TextInput underlineColorAndroid="transparent" style={styles.input} placeholder="Search" placeholderTextColor="#777" clearButtonMode="always" />
+                <View style={styles.searchContainer}>
+                    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+                        <Animated.View style={[styles.inputContainer, {
+                            width: animation.interpolate({
+                                inputRange: [0, 1],
+                                outputRange: ['100%', '79%']
+                            })
+                        }]}>
+                            <Icon style={styles.inputIcon} name="search-outline" size={16} color="#777" />
+                            <TextInput 
+                                underlineColorAndroid="transparent" 
+                                style={styles.input} 
+                                placeholder="Search" 
+                                placeholderTextColor="#777" 
+                                clearButtonMode="always"
+                                onChangeText={(text) => setSearchText(text)}
+                                value={searchText}
+                                onFocus={() => setIsFocused(true)}
+                                returnKeyLabel="Search"
+                                returnKeyType="search"
+                            />
+                        </Animated.View>
+                    </TouchableWithoutFeedback>
+                    <Animated.View style={[styles.cancel, {
+                        opacity: fadeAnimation
+                    }]}>
+                        <Button title="Cancel" onPress={handleCancelSearch}/>
+                    </Animated.View>
                 </View>
                 <FlatList
                     style={{ paddingBottom: '3%'}}
